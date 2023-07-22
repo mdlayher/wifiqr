@@ -19,7 +19,7 @@ func main() {
 		log.Fatalf("failed to create QR code: %v", err)
 	}
 
-	if err := png.Encode(os.Stdout, img); err != nil {
+	if err := png.Encode(os.Stdout, img.Image()); err != nil {
 		log.Fatalf("failed to encode PNG: %v", err)
 	}
 }

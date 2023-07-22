@@ -10,22 +10,36 @@ import (
 	qrcode "github.com/skip2/go-qrcode"
 )
 
+// An Image is a WiFi QR code image which may be encoded in a variety of formats
+// for display.
+type Image struct{ qr *qrcode.QRCode }
+
 // New generates an image containing a WiFi QR code using the parameters defined
 // in Config. See the documentation of Config for details.
-func New(cfg Config) (image.Image, error) {
+func New(cfg Config) (*Image, error) {
 	s, err := cfg.encode()
 	if err != nil {
 		return nil, err
 	}
 
-	// TODO(mdlayher): make quality and dimensions configurable.
+	// TODO(mdlayher): make quality configurable.
 	qr, err := qrcode.New(s, qrcode.Medium)
 	if err != nil {
 		return nil, err
 	}
 
-	return qr.Image(-10), nil
+	return &Image{qr: qr}, nil
 }
+
+// Image returns an image which may be encoded for external use.
+func (i *Image) Image() image.Image {
+	// TODO(mdlayher): make dimensions configurable.
+	return i.qr.Image(-10)
+}
+
+// String returns a Unicode string for an Image, suitable for display in a
+// terminal.
+func (i *Image) String() string { return i.qr.ToSmallString(false) }
 
 // Authentication defines the type of WiFi authentication used by a network.
 type Authentication int

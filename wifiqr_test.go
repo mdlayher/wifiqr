@@ -6,6 +6,46 @@ import (
 	"github.com/google/go-cmp/cmp"
 )
 
+func TestImageString(t *testing.T) {
+	const want = `█████████████████████████████████████
+█████████████████████████████████████
+████ ▄▄▄▄▄ ██ ▀ ▀▀▄ ▄▀▄█ █ ▄▄▄▄▄ ████
+████ █   █ █ ▄▀ █ ▄▀▄▄ ▄▄█ █   █ ████
+████ █▄▄▄█ █ █ ▀█▀▄▄▄▀▄ ▀█ █▄▄▄█ ████
+████▄▄▄▄▄▄▄█ ▀▄█▄▀ █ ▀ ▀▄█▄▄▄▄▄▄▄████
+████ ▀▄ ▄ ▄█▀▄█ ▄▄▀ ██▄███▄   ▄█▀████
+████ ▄▄▄█▄▄▄▀▀ ▀▀██▄ ▄██ █▀▀ ▀▄█ ████
+████ █▀ █▀▄▄▄ ▄ ▄▀█  ▄▄▀▄ ▄██    ████
+████▀███▀▀▄▀▄▀▀▄▄ ▄█▀ ▀ ▄▀▀▄▀▀ ██████
+████▀▀ ▀▄▀▄█▀ ████▄ ▄█▄█ ▄█▄▀▀▄▀▀████
+████ █ ██▀▄▄▄▀ ▄▀█▀▄▀▄█▀▀▀▀  ▀█▄▀████
+████▄██▄▄█▄█▀▄█ ▀▀▀ █▄▄█ ▄▄▄ ▀ ▄▄████
+████ ▄▄▄▄▄ █▀█▄▀▄ ▄█ ▄▀▀ █▄█  ▄██████
+████ █   █ █  ▄▀██▄  █▄▄ ▄  ▄██▀█████
+████ █▄▄▄█ █▄▄█▄▀▀ ▄▀ ▀▄███▀█ ▀ ▀████
+████▄▄▄▄▄▄▄█▄▄▄▄▄██▄█▄████▄█▄█▄▄█████
+█████████████████████████████████████
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
+`
+
+	img, err := New(Config{
+		Authentication: WPA,
+		SSID:           "Example",
+		Password:       "thisisanexample",
+	})
+	if err != nil {
+		t.Fatalf("failed to create image: %v", err)
+	}
+
+	// Display to terminal for manual verification with a phone.
+	got := img.String()
+	t.Logf("\n%s", got)
+
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Fatalf("unexpected QR code string (-want +got):\n%s", diff)
+	}
+}
+
 func TestConfig_encode(t *testing.T) {
 	tests := []struct {
 		name string
