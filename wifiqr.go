@@ -22,8 +22,7 @@ func New(cfg Config) (*Image, error) {
 		return nil, err
 	}
 
-	// TODO(mdlayher): make quality configurable.
-	qr, err := qrcode.New(s, qrcode.Medium)
+	qr, err := qrcode.New(s, cfg.RecoveryLevel.convert())
 	if err != nil {
 		return nil, err
 	}
@@ -51,6 +50,38 @@ const (
 	WPA
 )
 
+// RecoveryLevel defines the QR code recovery and error detection level.
+type RecoveryLevel int
+
+// Possible RecoveryLevel values. Medium is a good default for most
+// applications.
+const (
+	Medium RecoveryLevel = iota
+	Low
+	High
+	Highest
+)
+
+// convert converts a RecoveryLevel to a qrcode.RecoveryLevel.
+func (rl RecoveryLevel) convert() qrcode.RecoveryLevel {
+	// This conversion exists because the zero value for qrcode.RecoveryLevel is
+	// "low" while we'd like medium to be the default instead, per the docs
+	// stating it is a reasonable default.
+	switch rl {
+	case Low:
+		return qrcode.Low
+	case High:
+		return qrcode.High
+	case Highest:
+		return qrcode.Highest
+	case Medium:
+		fallthrough
+	default:
+		// Medium or unspecified value.
+		return qrcode.Medium
+	}
+}
+
 // A Config defines the parameters for generating a WiFi QR code.
 type Config struct {
 	// Authentication specifies the type of WiFi authentication used by a
@@ -68,6 +99,10 @@ type Config struct {
 
 	// Hidden defines whether the WiFi network is hidden.
 	Hidden bool
+
+	// RecoveryLevel specifies the QR code recovery and error detection level.
+	// If unset, Medium is used as the default.
+	RecoveryLevel RecoveryLevel
 }
 
 // A kv holds a key/value string pair used to generate WiFi QR code values.

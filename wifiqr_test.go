@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
+	"github.com/skip2/go-qrcode"
 )
 
 func TestImageString(t *testing.T) {
@@ -128,6 +129,52 @@ func TestConfig_encode(t *testing.T) {
 
 			if diff := cmp.Diff(tt.str, str); diff != "" {
 				t.Fatalf("unexpected encoded string (-want +got):\n%s", diff)
+			}
+		})
+	}
+}
+
+func TestRecoveryLevel_convert(t *testing.T) {
+	tests := []struct {
+		name string
+		in   RecoveryLevel
+		out  qrcode.RecoveryLevel
+	}{
+		{
+			name: "zero",
+			out:  qrcode.Medium,
+		},
+		{
+			name: "unhandled",
+			in:   100,
+			out:  qrcode.Medium,
+		},
+		{
+			name: "low",
+			in:   Low,
+			out:  qrcode.Low,
+		},
+		{
+			name: "medium",
+			in:   Medium,
+			out:  qrcode.Medium,
+		},
+		{
+			name: "high",
+			in:   High,
+			out:  qrcode.High,
+		},
+		{
+			name: "highest",
+			in:   Highest,
+			out:  qrcode.Highest,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if diff := cmp.Diff(tt.out, tt.in.convert()); diff != "" {
+				t.Fatalf("unexpected recovery level (-want +got):\n%s", diff)
 			}
 		})
 	}
