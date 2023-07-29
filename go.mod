@@ -5,4 +5,7 @@ go 1.20
 require (
 	github.com/google/go-cmp v0.5.9
 	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e
+	golang.org/x/term v0.10.0
 )
+
+require golang.org/x/sys v0.10.0 // indirect
